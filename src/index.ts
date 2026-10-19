@@ -2,6 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { bankFailureQuery } from "./failure-filters.js";
 
 const server = new McpServer({ name: "mcp-fdic", version: "1.0.0" });
 const BASE = "https://banks.data.fdic.gov/api";
@@ -51,19 +52,17 @@ server.tool("institution_detail", "Get detailed info for an FDIC-insured institu
 server.tool("bank_failures", "Search FDIC bank failure history", {
   name: z.string().optional(),
   state: z.string().optional(),
-  start_year: z.string().optional(),
-  end_year: z.string().optional(),
+  start_year: z.string().optional().describe("Inclusive 4-digit start year (FAILYR)"),
+  end_year: z.string().optional().describe("Inclusive 4-digit end year (FAILYR)"),
   limit: z.number().default(10),
 }, async ({ name, state, start_year, end_year, limit }) => {
-  const filters: string[] = [];
-  if (name) filters.push(`INSTNAME:${name}`);
-  if (state) filters.push(`FAILST:${state}`);
-  const data = await fdic("/failures", {
-    filters: filters.join(" AND "),
-    limit: String(limit),
-    sort_by: "FAILDATE",
-    sort_order: "DESC",
-  });
+  const data = await fdic("/failures", bankFailureQuery({
+    name,
+    state,
+    start_year,
+    end_year,
+    limit,
+  }));
   return { content: [{ type: "text", text: JSON.stringify(data, null, 2) }] };
 });
 
