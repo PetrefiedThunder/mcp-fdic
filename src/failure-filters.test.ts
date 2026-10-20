@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bankFailureQuery } from "./failure-filters.ts";
+import { bankFailureQuery } from "./failure-filters.js";
 
 test("disjoint year ranges produce different FDIC parameters", () => {
   const early = bankFailureQuery({ start_year: "2000", end_year: "2001", limit: 10 });
