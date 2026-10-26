@@ -10,7 +10,7 @@
     "pretest": "npm run build",
     "test": "node --test dist/failure-filters.test.js"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/PetrefiedThunder/mcp-fdic"
